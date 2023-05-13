@@ -1,0 +1,16 @@
+.blogImage {
+    width: 100%;
+    max-height: 600px;
+}
+
+@media screen and (min-width: 601px) {
+    .blog-container {
+        grid-template-columns: 0.9fr 1.1fr;
+    }
+
+    .blog-container .post-text h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+}
