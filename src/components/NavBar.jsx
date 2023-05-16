@@ -8,7 +8,7 @@ const NavBar = () => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userName');
-        localStorage.removeItem('admin');
+        localStorage.removeItem('techBlogAdmin');
         navigate('/login');
     }
 
@@ -29,6 +29,12 @@ const NavBar = () => {
                                 <Link className="nav-link" to="/createblog">Create Blog</Link>
                             </li>
                         }
+                        <li className="nav-item">
+                            <Link className="nav-link" aria-current="page" to="https://github.com/pratikbanger" target="_blank">GitHub</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" aria-current="page" to="https://www.linkedin.com/in/pratik-banger-677013258/" target="_blank">LinkdeIn</Link>
+                        </li>
                     </ul>
                     {!localStorage.getItem('token') ?
                         <form className="d-flex" role="search">
@@ -43,7 +49,7 @@ const NavBar = () => {
                                     {localStorage.getItem('userName').split(' ')[0]}
                                 </Link>
                             </span>
-                            <Link className='btn btn-outline-danger mx-1 btn-sm' to="/" onClick={handleLogout} role="button">Logout</Link>
+                            <Link className='btn btn-outline-danger mx-1 btn-sm' to="/login" onClick={handleLogout} role="button">Logout</Link>
                         </>
                     }
                 </div>

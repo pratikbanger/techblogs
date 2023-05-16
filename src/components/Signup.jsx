@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import loadingSpinner from './loadingSpinner.gif'
 import * as Yup from 'yup';
 import { Formik, Field, Form } from 'formik'
 
@@ -12,6 +13,7 @@ const Signup = () => {
   const [signUpMessage, setSignUpMessage] = useState('')
   const [alertType, setAlertType] = useState('danger')
   const [isActive, setIsActive] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const signUpSchema = Yup.object({
     name: Yup.string().min(2, "Name should be at least 2 character long").required("This field is required*"),
@@ -22,6 +24,7 @@ const Signup = () => {
 
   const handleSignup = async (values) => {
 
+    setLoading(true)
     const response = await fetch(`${backendLink}/api/auth/signup`, {
       method: 'POST',
       headers: {
@@ -30,6 +33,7 @@ const Signup = () => {
       body: JSON.stringify({ values }),
     })
     const json = await response.json()
+    setLoading(false)
 
     if (!json.success) {
       setSignUpMessage(json.message)
@@ -52,6 +56,9 @@ const Signup = () => {
   return (
     <main className='mt-5'>
       <h2>Create Account - Ai Blog</h2>
+      <div className='container mt-3 d-flex justify-content-center'>
+        {loading && <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />}
+      </div>
       <div id='signUpSuccess' className={`alert ${alertType === 'danger' ? 'alert-danger' : 'alert-success'} ${!isActive ? 'd-none' : null}`} role="alert">
         {signUpMessage}
       </div>

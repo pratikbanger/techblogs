@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import './CSS/Blog.css';
+import loadingSpinner from './loadingSpinner.gif'
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 
 const Blogs = () => {
 
     const backendLink = process.env.REACT_APP_BACKEND_LINK
     const [blog, setBlog] = useState([])
     const [keyword, setKeyword] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [totalResults, setTotalResults] = useState(0)
+    const [page, setPage] = useState(1)
 
     const getBlogs = async () => {
+        setLoading(true)
         // API call
-        const response = await fetch(`${backendLink}/api/blog/getblogs`, {
+        const response = await fetch(`${backendLink}/api/blog/getblogs?page=${page}&limit=4`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': localStorage.getItem('token')
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
         const json = await response.json();
-        setBlog(json);
+        setBlog(json.allBlogs)
+        setTotalResults(json.totalResults)
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -28,24 +34,22 @@ const Blogs = () => {
     }, [])
 
     const handleDeleteBlog = async (e, id) => {
-
-        const confirmDelete = window.confirm('Are you sure you want to delete this Blog?');
-
-        if (confirmDelete) {
-            await fetch(`${backendLink}/api/blog/deleteblog/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': localStorage.getItem('token')
-                }
-            })
-            getBlogs()
-        }
+        e.preventDefault()
+        setLoading(true)
+        await fetch(`${backendLink}/api/blog/deleteblog/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': localStorage.getItem('token')
+            }
+        })
+        setLoading(false)
+        getBlogs()
     }
 
     const handleSearch = (e) => {
         e.preventDefault();
-
+        setLoading(true)
         const getBlogs = async (keyword) => {
             // API call
             const response = await fetch(`${backendLink}/api/blog/searchblogs`, {
@@ -56,10 +60,22 @@ const Blogs = () => {
                 body: JSON.stringify({ keyword })
             });
             const json = await response.json();
+            setLoading(false)
             setBlog(json);
         }
-
         getBlogs(keyword)
+    }
+
+    const fetchMoreData = async () => {
+        // API call
+        const response = await fetch(`${backendLink}/api/blog/getblogs?page=${page + 1}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        setPage(page + 1)
+        const json = await response.json()
+        setBlog(blog.concat(json.allBlogs))
+        setTotalResults(json.totalResults)
     }
 
     return (
@@ -68,11 +84,25 @@ const Blogs = () => {
                 <input type='search' value={keyword} onChange={e => setKeyword(e.target.value)} className='searchInput mx-2 px-2'></input>
                 <button className='mx-2 btn btn-primary' onClick={handleSearch}>Search</button>
             </div>
-            {blog.length === 0 ?
-                <div className='container mt-3 d-flex justify-content-center'>
-                    <h1 className='fw-bold'>No blog found</h1>
-                </div>
-                : blog.map((data) => (
+            {blog.length === 0 &&
+                <div className='container mt-5 d-flex justify-content-center'>
+                    {!loading && <h1 className='fw-bold'>No blog found</h1>}
+                </div>}
+            {loading &&
+                <div className='container mt-5 d-flex justify-content-center'>
+                    <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />
+                </div>}
+            <InfiniteScroll
+                dataLength={blog.length}
+                next={fetchMoreData}
+                hasMore={blog.length !== totalResults}
+                loader={
+                    <div className='container mt-5 d-flex justify-content-center'>
+                        <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />
+                    </div>
+                }
+            >
+                {blog.map((data) => (
                     <div key={data._id} className='blog-container'>
                         <div className=''>
                             <img className="post-image" src={data.files} alt="" />
@@ -85,7 +115,8 @@ const Blogs = () => {
                             <p>{data.summary.length > 60 ? data.summary.substr(0, 200) + "..." : data.summary}</p>
                             {/* Summary length should be less than 148 words */}
 
-                            {localStorage.getItem('admin') === 'true' &&
+                            {/* {isAdmin && */}
+                            {localStorage.getItem('techBlogAdmin') === 'true' &&
                                 <div className='d-flex justify-content-between'>
                                     <div className='d-flex align-items-center'>
                                         <Link to={`/editblog/${data._id}`} className='resetLink'>
@@ -94,17 +125,36 @@ const Blogs = () => {
                                         </Link>
                                     </div>
                                     <div className='d-flex align-items-center'>
-                                        <button className='myBtn' onClick={e => handleDeleteBlog(e, data._id)}>
+                                        <button className='myBtn' data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                                             <i className="fa-solid fa-trash"></i>
                                             <strong className='mx-2'>Delete Post</strong>
                                         </button>
                                     </div>
+
+                                    {/* Confirm modal */}
+                                    <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div className="modal-dialog">
+                                            <div className="modal-content">
+                                                <div className="modal-header">
+                                                    <h1 className="modal-title fs-5" id="staticBackdropLabel">Delete Blog</h1>
+                                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div className="modal-body">
+                                                    Are you sure you want to delete this Blog?
+                                                </div>
+                                                <div className="modal-footer">
+                                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={e => handleDeleteBlog(e, data._id)}>Confirm Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             }
-
                         </div>
                     </div>
                 ))}
+            </InfiniteScroll>
         </main>
     )
 }

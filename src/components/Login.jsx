@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import './CSS/Login.css'
 import { useNavigate } from 'react-router-dom';
+import loadingSpinner from './loadingSpinner.gif'
 import * as Yup from 'yup'
 import { Formik, Form, Field } from 'formik'
 
@@ -13,6 +14,7 @@ const Login = () => {
   const [signUpMessage, setSignUpMessage] = useState('')
   const [alertType, setAlertType] = useState('danger')
   const [isActive, setIsActive] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const LogInSchema = Yup.object({
     email: Yup.string().email("Invalid email address!").required("Email is required*"),
@@ -20,7 +22,7 @@ const Login = () => {
   })
 
   const handleLoginSubmit = async (values) => {
-
+    setLoading(true)
     const response = await fetch(`${backendLink}/api/auth/login`, {
       method: 'POST',
       headers: {
@@ -30,6 +32,7 @@ const Login = () => {
     })
     const json = await response.json();
 
+    setLoading(false)
     if (!json.success) {
       setSignUpMessage(json.message)
       setIsActive(true)
@@ -41,7 +44,10 @@ const Login = () => {
       localStorage.setItem('token', json.authToken);
       localStorage.setItem('userName', json.userName);
       if (json.isAdmin) {
-        localStorage.setItem('admin', json.isAdmin);
+        localStorage.setItem('techBlogAdmin', json.isAdmin)
+      }
+      else{
+        localStorage.setItem('techBlogAdmin', json.isAdmin)
       }
       setSignUpMessage(json.message)
       setAlertType('success')
@@ -55,7 +61,9 @@ const Login = () => {
 
   return (
     <main className='mt-5'>
-      <h2>Login to Ai Blogs</h2>
+      <h2>Login to Ai Blogs</h2><div className='container mt-3 d-flex justify-content-center'>
+        {loading && <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />}
+      </div>
       <div id='signUpSuccess' className={`alert ${alertType === 'danger' ? 'alert-danger' : 'alert-success'} ${!isActive ? 'd-none' : null}`} role="alert">
         {signUpMessage}
       </div>

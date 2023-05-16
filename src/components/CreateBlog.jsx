@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CSS/CreateBlog.css'
+import loadingSpinner from './loadingSpinner.gif'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import FileBase from 'react-file-base64';
@@ -17,10 +18,11 @@ const CreateBlog = () => {
   const [alertMessage, setAlertMessage] = useState('')
   const [alertType, setAlertType] = useState('danger')
   const [isActive, setIsActive] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleCreateBLOG = (e) => {
     e.preventDefault();
-
+    setLoading(true)
     const addBlog = async (title, summary, content, files) => {
       // API call
       const response = await fetch(`${backendLink}/api/blog/addblog`, {
@@ -32,7 +34,7 @@ const CreateBlog = () => {
         body: JSON.stringify({ title, summary, content, files })
       })
       const json = await response.json()
-
+      setLoading(false)
       if (!json.success) {
         setAlertMessage(json.message)
         setIsActive(true)
@@ -40,7 +42,6 @@ const CreateBlog = () => {
           setIsActive(false)
         }, 3000);
       } else {
-
         setAlertMessage(json.message)
         setAlertType('success')
         setIsActive(true)
@@ -50,7 +51,6 @@ const CreateBlog = () => {
         }, 2000);
       }
     }
-
     addBlog(postData.title, postData.summary, postData.content, postData.files);
   }
 
@@ -59,6 +59,9 @@ const CreateBlog = () => {
       {!localStorage.getItem('token')
         ? <Login />
         : <main>
+          {loading && <div className='container mt-5 d-flex justify-content-center'>
+            <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />
+          </div>}
           <form className='mt-3' onSubmit={handleCreateBLOG}>
             <div id='signUpSuccess' className={`alert ${alertType === 'danger' ? 'alert-danger' : 'alert-success'} ${!isActive ? 'd-none' : null}`} role="alert">
               {alertMessage}
