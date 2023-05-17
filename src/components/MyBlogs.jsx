@@ -73,16 +73,19 @@ const MyBlogs = () => {
                     </div>
                     {getMyBlogs.length === 0 &&
                         <div className='container mt-2 d-flex justify-content-center'>
-                            {loading && <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />}
                             {!loading && <p className='fw-bold mt-5 text-danger'>You haven't created any Blog yet! click here to <Link to="/createblog">Create blog</Link></p>}
+                        </div>}
+                    {loading &&
+                        <div className='container mt-5 d-flex justify-content-center' style={{ width: "120px", height: "120px" }}>
+                            <img src={loadingSpinner} alt="loading..." />
                         </div>}
                     <InfiniteScroll
                         dataLength={getMyBlogs.length}
                         next={fetchMoreData}
                         hasMore={getMyBlogs.length !== totalResults}
                         loader={
-                            <div className='container mt-5 d-flex justify-content-center'>
-                                <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />
+                            <div className='container mt-5 d-flex justify-content-center' style={{ width: "120px", height: "120px" }}>
+                                <img src={loadingSpinner} alt="loading..." />
                             </div>
                         }
                     >

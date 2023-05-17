@@ -56,9 +56,10 @@ const Signup = () => {
   return (
     <main className='mt-5'>
       <h2>Create Account - Ai Blog</h2>
-      <div className='container mt-3 d-flex justify-content-center'>
-        {loading && <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />}
-      </div>
+      {loading &&
+        <div className='container mt-5 d-flex justify-content-center' style={{ width: "120px", height: "120px" }}>
+          <img src={loadingSpinner} alt="loading..." />
+        </div>}
       <div id='signUpSuccess' className={`alert ${alertType === 'danger' ? 'alert-danger' : 'alert-success'} ${!isActive ? 'd-none' : null}`} role="alert">
         {signUpMessage}
       </div>

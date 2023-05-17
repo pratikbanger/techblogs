@@ -89,16 +89,16 @@ const Blogs = () => {
                     {!loading && <h1 className='fw-bold'>No blog found</h1>}
                 </div>}
             {loading &&
-                <div className='container mt-5 d-flex justify-content-center'>
-                    <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />
+                <div className='container mt-5 d-flex justify-content-center' style={{ width: "120px", height: "120px" }}>
+                    <img src={loadingSpinner} alt="loading..." />
                 </div>}
             <InfiniteScroll
                 dataLength={blog.length}
                 next={fetchMoreData}
                 hasMore={blog.length !== totalResults}
                 loader={
-                    <div className='container mt-5 d-flex justify-content-center'>
-                        <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />
+                    <div className='container mt-5 d-flex justify-content-center' style={{ width: "120px", height: "120px" }}>
+                        <img src={loadingSpinner} alt="loading..." />
                     </div>
                 }
             >

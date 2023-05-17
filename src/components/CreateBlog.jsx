@@ -59,8 +59,8 @@ const CreateBlog = () => {
       {!localStorage.getItem('token')
         ? <Login />
         : <main>
-          {loading && <div className='container mt-5 d-flex justify-content-center'>
-            <img style={{ width: "70px" }} src={loadingSpinner} alt="loading..." />
+          {loading && <div className='container mt-5 d-flex justify-content-center' style={{ width: "120px", height: "120px" }}>
+            <img src={loadingSpinner} alt="loading..." />
           </div>}
           <form className='mt-3' onSubmit={handleCreateBLOG}>
             <div id='signUpSuccess' className={`alert ${alertType === 'danger' ? 'alert-danger' : 'alert-success'} ${!isActive ? 'd-none' : null}`} role="alert">
