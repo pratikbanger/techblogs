@@ -10,6 +10,7 @@ const MyBlogs = () => {
 
     const backendLink = process.env.REACT_APP_BACKEND_LINK
     const [getMyBlogs, setGetMyBlogs] = useState([])
+    const [blogID, setBlogID] = useState(null)
     const [loading, setLoading] = useState(false)
     const [totalResults, setTotalResults] = useState(0)
     const [page, setPage] = useState(1)
@@ -44,6 +45,7 @@ const MyBlogs = () => {
                 'auth-token': localStorage.getItem('token')
             }
         })
+        setBlogID(null)
         setLoading(false)
         myBlogs()
     }
@@ -71,6 +73,26 @@ const MyBlogs = () => {
                     <div className='container d-flex justify-content-center'>
                         <h2 className='fw-bold mt-3'>MY BLOGS</h2>
                     </div>
+
+                    {/* Confirm modal */}
+                    <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h1 className="modal-title fs-5" id="staticBackdropLabel">Delete Blog</h1>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    Are you sure you want to delete this Blog?
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={e => handleDeleteBlog(e, blogID)}>Confirm Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {getMyBlogs.length === 0 &&
                         <div className='container mt-2 d-flex justify-content-center'>
                             {!loading && <p className='fw-bold mt-5 text-danger'>You haven't created any Blog yet! click here to <Link to="/createblog">Create blog</Link></p>}
@@ -79,6 +101,8 @@ const MyBlogs = () => {
                         <div className='container mt-5 d-flex justify-content-center' style={{ width: "120px", height: "120px" }}>
                             <img src={loadingSpinner} alt="loading..." />
                         </div>}
+
+                    {/* Logic to fetch more blogs */}
                     <InfiniteScroll
                         dataLength={getMyBlogs.length}
                         next={fetchMoreData}
@@ -109,29 +133,10 @@ const MyBlogs = () => {
                                             </Link>
                                         </div>
                                         <div className='d-flex align-items-center'>
-                                            <button type="button" className='myBtn' data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                            <button type="button" className='myBtn' onClick={e => setBlogID(data._id)} data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                                                 <i className="fa-solid fa-trash"></i>
                                                 <strong className='mx-2'>Delete Post</strong>
                                             </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Confirm modal */}
-                                <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                    <div className="modal-dialog">
-                                        <div className="modal-content">
-                                            <div className="modal-header">
-                                                <h1 className="modal-title fs-5" id="staticBackdropLabel">Delete Blog</h1>
-                                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div className="modal-body">
-                                                Are you sure you want to delete this Blog?
-                                            </div>
-                                            <div className="modal-footer">
-                                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={e => handleDeleteBlog(e, data._id)}>Confirm Delete</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

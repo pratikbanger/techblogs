@@ -10,6 +10,7 @@ const Blogs = () => {
 
     const backendLink = process.env.REACT_APP_BACKEND_LINK
     const [blog, setBlog] = useState([])
+    const [blogID, setBlogID] = useState(null)
     const [keyword, setKeyword] = useState('')
     const [loading, setLoading] = useState(false)
     const [totalResults, setTotalResults] = useState(0)
@@ -43,6 +44,7 @@ const Blogs = () => {
                 'auth-token': localStorage.getItem('token')
             }
         })
+        setBlogID(null)
         setLoading(false)
         getBlogs()
     }
@@ -84,6 +86,26 @@ const Blogs = () => {
                 <input type='search' value={keyword} onChange={e => setKeyword(e.target.value)} className='searchInput mx-2 px-2'></input>
                 <button className='mx-2 btn btn-primary' onClick={handleSearch}>Search</button>
             </div>
+
+            {/* Confirm modal */}
+            <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1 className="modal-title fs-5" id="staticBackdropLabel">Delete Blog</h1>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            Are you sure you want to delete this Blog?
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={e => handleDeleteBlog(e, blogID)}>Confirm Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {blog.length === 0 &&
                 <div className='container mt-5 d-flex justify-content-center'>
                     {!loading && <h1 className='fw-bold'>No blog found</h1>}
@@ -125,29 +147,10 @@ const Blogs = () => {
                                         </Link>
                                     </div>
                                     <div className='d-flex align-items-center'>
-                                        <button className='myBtn' data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                        <button className='myBtn' onClick={e => setBlogID(data._id)} data-bs-toggle="modal" data-bs-target="#staticBackdrop" >
                                             <i className="fa-solid fa-trash"></i>
                                             <strong className='mx-2'>Delete Post</strong>
                                         </button>
-                                    </div>
-
-                                    {/* Confirm modal */}
-                                    <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                        <div className="modal-dialog">
-                                            <div className="modal-content">
-                                                <div className="modal-header">
-                                                    <h1 className="modal-title fs-5" id="staticBackdropLabel">Delete Blog</h1>
-                                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div className="modal-body">
-                                                    Are you sure you want to delete this Blog?
-                                                </div>
-                                                <div className="modal-footer">
-                                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={e => handleDeleteBlog(e, data._id)}>Confirm Delete</button>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             }
